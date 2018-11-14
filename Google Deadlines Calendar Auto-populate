@@ -1,0 +1,234 @@
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var sheetDates = ss.getSheetByName("Networks Dates");
+
+var calNetworks = CalendarApp.getCalendarsByName("Networks eTracker Calendar")[0];
+
+var dateXmas15Start = new Date(2015,11,21);
+var dateXmas15End = new Date(2016,00,03);
+var dateXmas16Start = new Date(2016,11,19);
+var dateXmas16End = new Date(2017,00,01);
+var dateXmas17Start = new Date(2017,11,18);
+var dateXmas17End = new Date(2017,11,31);
+// var dateXmas18Start = new Date();
+// var dateXmas18End = new Date();
+
+function populateCalendar() {
+  
+  var infoAll = sheetDates.getRange("B11:J50").getValues();  
+  var heightInfoAll = infoAll.length;
+  var widthInfoAll = infoAll[0].length;
+  
+  var firstRow = 11;
+  var lastRow = sheetDates.getLastRow();
+  
+  for (var i = 0; i < lastRow-firstRow; i++) {
+    
+    var title = infoAll[i][8] + " (" + infoAll[i][7] + ")";
+    var message = infoAll[i][0];
+    var dateSubmissionStart = infoAll[i][1];
+    var dateSubmissionDL = infoAll[i][2];
+    var dateETrackersApproved = infoAll[i][3];
+    var dateDraftESISRelease = infoAll[i][4];
+    var dateDraftESISCommentsDL = infoAll[i][5];
+    var dateFinalConfigRelease = infoAll[i][6];
+    
+    createCalendarEvent(dateSubmissionStart,dateSubmissionDL,title + " : eTrackers Submitted",message);
+    createCalendarEvent(dateSubmissionDL,dateETrackersApproved,title + " : eTrackers Approved",message);
+    createCalendarEvent(dateDraftESISRelease,dateDraftESISRelease,title + " : Draft ESIS Release",message);
+    createCalendarEvent(dateDraftESISRelease,dateDraftESISCommentsDL,title + " : Draft ESIS Reviewed",message);
+    createCalendarEvent(dateFinalConfigRelease,dateFinalConfigRelease,title + " : Final Config Release",message); 
+    
+  } 
+  
+}
+
+
+function createCalendarEvent(firstDate,lastDate,title,message) {
+  
+  var dayStart = firstDate;
+  var dayFinish = lastDate;
+  var summary = title
+  
+  if (dayStart == dayFinish) {
+    calNetworks.createAllDayEvent(title,new Date(dayFinish),{description: message})
+  }
+  else
+  {
+    
+    var weeksSubmission = differenceDates(dayStart,dayFinish);
+    
+    Logger.log(weeksSubmission)
+    
+    var daysAdded = 6;
+    var christmas = 0;
+    
+    var iterWS = 0;
+    
+    Logger.log(dayStart);
+    Logger.log(dayFinish);
+    
+    if(ifChristmasRange(dayStart,dayFinish)) {
+      iterWS = weeksSubmission[0] - 2;
+      Logger.log("entered christmas period");
+    }
+    else
+    {
+      iterWS = weeksSubmission[0];
+      Logger.log("did not enter christmas period");
+    }
+    
+    if (weeksSubmission[1] == 0) {
+      iterWS = weeksSubmission[0] - 1;
+    } 
+    
+    for (var j = 0; j <= iterWS; j++) {
+      
+      if (j == iterWS && weeksSubmission[1] != 0) {
+        daysAdded = weeksSubmission[1];
+      }
+      else {
+        daysAdded = 6;
+      }
+      
+      if(ifChristmas(addDays(dayFinish,-(j*7)-daysAdded))&&christmas!=1) {
+        var startDate = Utilities.formatDate(addDays(dayFinish,-(j*7)-daysAdded-(christmas*14)+2), "GMT+1", "yyyy-MM-dd");
+        var endDate = Utilities.formatDate(addDays(dayFinish,-(j*7)+1-(christmas*14)+1), "GMT+1", "yyyy-MM-dd")
+        christmas = 1;
+      }
+      else
+      {
+        var startDate = Utilities.formatDate(addDays(dayFinish,-(j*7)-daysAdded-(christmas*14)), "GMT+1", "yyyy-MM-dd");
+        var endDate = Utilities.formatDate(addDays(dayFinish,-(j*7)+1-(christmas*14)), "GMT+1", "yyyy-MM-dd")
+      }
+      
+      Logger.log(startDate)
+      Logger.log(endDate)
+      
+      var event = {
+        description: message,
+        summary: "[" + j + " wks] " + title,
+        start: { date: startDate },
+          end: { date: endDate}
+    };
+    
+    event = Calendar.Events.insert(event, calNetworks.getId());
+  }
+}
+
+}
+
+
+function addDays(date, days) {
+  return new Date(date.getTime() + (days * 24 * 60 * 60 * 1000));
+}
+
+
+function ifChristmasRange(testDateStart,testDateEnd) {
+  
+  if (testDateStart <= dateXmas15Start && testDateEnd >= dateXmas15End || testDateStart <= dateXmas16Start && testDateEnd >= dateXmas16End || testDateStart <= dateXmas17Start && testDateEnd >= dateXmas17End) {
+    Logger.log("Christmas");
+    return true;
+  }
+  else
+  {
+    Logger.log("Not Christmas");
+    return false;
+  }
+
+}
+
+
+function ifChristmas(testDate) {
+  
+  if (testDate >= dateXmas15Start && testDate <= dateXmas15End || testDate >= dateXmas16Start && testDate <= dateXmas16End || testDate >= dateXmas17Start && testDate <= dateXmas17End) {
+    Logger.log("Christmas");
+    return true;
+  }
+  else
+  {
+    Logger.log("Not Christmas");
+    return false;
+  }
+  
+}
+
+
+function cleanseCalendar() {
+  
+  var eventsCalNetworks = calNetworks.getEvents(new Date(2013,00,01), new Date(2020,11,31))
+  
+  for (var i = 0; i < eventsCalNetworks.length; i++) {
+    eventsCalNetworks[i].deleteEvent();
+  }
+  
+}
+
+
+function differenceDates(dateStart, dateFinish) {
+  
+  var differenceDays = (dateFinish - dateStart)/(24*60*60*1000)
+  var wholeWeeks = Math.floor(differenceDays/7);
+  var remainingDays = Math.round(differenceDays - wholeWeeks*7);
+  
+  while (remainingDays >= 7) {
+    wholeWeeks += 1;
+    remainingDays -= 7;
+  }
+  
+  return([wholeWeeks,remainingDays]);
+  
+}
+
+//====================TEST====================//
+
+function test() {
+  
+  var infoAll = sheetDates.getRange("B12:J12").getValues();
+  
+  createCalendarEvent(infoAll[0][1],infoAll[0][2],infoAll[0][8] + " (eTrackers Raised)");
+  createCalendarEvent(infoAll[0][2],infoAll[0][3],infoAll[0][8] + " (eTrackers Approved)");
+  createCalendarEvent(infoAll[0][4],infoAll[0][4],infoAll[0][8] + " (Draft ESIS Release)");
+  createCalendarEvent(infoAll[0][4],infoAll[0][5],infoAll[0][8] + " (Draft ESIS Reviewed)");
+  createCalendarEvent(infoAll[0][6],infoAll[0][6],infoAll[0][8] + " (Final Config Release)");  
+  
+}
+
+function test2() {
+  
+  var dayFinish = new Date(2016,10,26) 
+  //2016,02,27 = 28/03/16 || 27th March (GMT)   
+  //2016,02,28 = 28/03/16 || 28th March (GMT+1)
+  //                                     
+  //2016,09,30 = 30/10/16 || 30th Oct (GMT+1)
+  //2016,09,31 = 01/11/16 || 31st Oct (GMT)
+  
+  var dayFinish2 = new Date(2016,01,08)
+  var daysAdded = 6;
+  var j = 0;
+  var christmas = 0;
+  var DST = 0;
+  
+  var startDate = Utilities.formatDate(addDays(dayFinish,-(j*7)-daysAdded+DST-(christmas*14)), "GMT", "yyyy-MM-dd");
+  var endDate = Utilities.formatDate(addDays(dayFinish,-(j*7)+1+DST-(christmas*14)), "GMT", "yyyy-MM-dd")
+  
+  Logger.log(Utilities.formatDate(addDays(dayFinish,0), "GMT+1", "yyyy-MM-dd"))
+  Logger.log(addDays(dayFinish,0));
+  
+  Logger.log(Utilities.formatDate(addDays(dayFinish2,-6), "GMT+1", "yyyy-MM-dd"))
+  Logger.log(addDays(dayFinish2,-6));
+  
+  Logger.log(startDate);
+  Logger.log(endDate);
+  
+}
+
+function test3() {
+  
+  var calWorkPlan = CalendarApp.getCalendarsByName("Nathan Kumar (work plan)")[0];
+  var beginningDate = new Date(2018,00,01)
+  
+  for (var i = 0; i < 52; i++) {
+    calWorkPlan.createAllDayEvent("Week " + (i + 1), addDays(beginningDate,i*7))
+  }
+  
+}
