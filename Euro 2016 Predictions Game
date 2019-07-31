@@ -1,1 +1,687 @@
-.
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var sheetTables = ss.getSheetByName("Tables");
+var sheetScores = ss.getSheetByName("Scores");
+var sheetLeaderboardsUn = ss.getSheetByName("Leaderboards - Unsorted");
+var sheetLeaderboards = ss.getSheetByName("Leaderboards");
+var sheetHH = ss.getSheetByName("Head-to-Head");
+var sheetHHSc = ss.getSheetByName("Head-to-Head Scores");
+var sheetHHFi = ss.getSheetByName("Head-to-Head Fixtures");
+var sheetDates = ss.getSheetByName("Dates");
+
+/* =========================== TRIGGERS
+Match                GameIDs
+
+20:00              11          T_MD1_2       1 Trigger  
+Friday 10th June               *T_MD1_1       Manual
+
+14:00              14          T_MD1_4       2 Trigger
+17:00              16          T_MD1_5       3 Trigger
+20:00              18          T_MD1_6       4 Trigger
+Saturday 11th June             *T_MD1_3       Manual
+
+14:00              21          T_MD1_8       5 Trigger
+17:00              23          T_MD1_9       6 Trigger
+20:00              25          T_MD1_10      7 Trigger
+Sunday 12th June               *T_MD1_7       Manual
+
+14:00              28          T_MD1_12      8 Trigger
+17:00              30          T_MD1_13      9 Trigger
+20:00              32          T_MD1_14      10 Trigger
+Monday 13th June               *T_MD1_11      Manual
+
+17:00              35          T_MD1_16      11 Trigger
+20:00              37          T_MD1_17      12 Trigger
+Tuesday 14th June              *T_MD1_15      Manual
+
+14:00              45          T_MD2_2       13 Trigger
+17:00              47          T_MD2_3       14 Trigger
+20:00              49          T_MD2_4       15 Trigger
+Wednesday 15th June            *T_MD2_1       Manual
+
+14:00              52          T_MD2_6       16 Trigger
+17:00              54          T_MD2_7       17 Trigger
+20:00              56          T_MD2_8       18 Trigger
+Thursday 16th June             *T_MD2_5       Manual
+
+14:00              59          T_MD2_10      19 Trigger
+17:00              61          T_MD2_11      20 Trigger
+20:00              63          T_MD2_12      21 Trigger
+Friday 17th June               *T_MD2_9       Manual
+
+14:00              66          T_MD2_14      22 Trigger
+17:00              68          T_MD2_15      23 Trigger
+20:00              70          T_MD2_16      24 Trigger
+Saturday 18th June             *T_MD2_13      Manual
+
+20:00              78          T_MD3_2       25 Trigger 
+20:00              80          T_MD3_3       26 Trigger
+Sunday 19th June               *T_MD3_1       Manual
+
+20:00              83          T_MD3_5       27 Trigger
+20:00              85          T_MD3_6       28 Trigger
+Monday 20th June               *T_MD3_4       Manual
+
+17:00              88          T_MD3_8       29 Trigger
+17:00              90          T_MD3_9       30 Trigger
+20:00              92          T_MD3_10      31 Trigger
+20:00              94          T_MD3_11      32 Trigger
+Tuesday 21st June              *T_MD3_7       Manual
+
+17:00              97          T_MD3_13      33 Trigger
+17:00              99          T_MD3_14      34 Trigger
+20:00              101         T_MD3_15      35 Trigger
+20:00              103         T_MD3_16      36 Trigger
+Wednesday 22nd June            *T_MD3_12      Manual
+
+14:00              112         T_ROS_2       37 Trigger
+17:00              116         T_ROS_3       38 Trigger                     
+20:00              114         T_ROS_4       39 Trigger                     
+Saturday 25th June             *T_ROS_1       Manual
+
+20:00              118         T_ROS_6       40 Trigger
+20:00              120         T_ROS_7       41 Trigger
+20:00              124         T_ROS_8       42 Trigger                     
+Sunday 26th June               *T_ROS_5       Manual
+
+20:00              122         T_ROS_10      43 Trigger                     
+20:00              126         T_ROS_11      44 Trigger
+Monday 27th June               *T_ROS_9       Manual
+
+20:00              129         T_FIN_2       45 Trigger
+Thursday 30th June             *T_FIN_1       Manual
+
+20:00              131         T_FIN_4       46 Trigger
+Friday 1st July                *T_FIN_3       Manual
+
+20:00              133         T_FIN_6       47 Trigger
+Saturday 2nd July              *T_FIN_5       Manual
+
+20:00              135         T_FIN_8       48 Trigger
+Sunday 3rd July                *T_FIN_7       Manual
+
+20:00              138         T_FIN_10      49 Trigger 
+Wednesday 6th July             *T_FIN_9       Manual
+
+20:00              140         T_FIN_12      50 Trigger
+Thursday 7th July              *T_FIN_11      Manual
+
+20:00              143         T_FIN_14      51 Trigger
+Sunday 10th July               *T_FIN_13      Manual
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+//20:00              11          *T_MD1_2      1 Trigger  
+//Friday 10th June               T_MD1_1       Manual
+function T_MD1_2() {
+  cutScores(11);
+}
+function T_MD1_1() {
+  updateScores(11);
+}
+
+//14:00              14          *T_MD1_4      2 Trigger
+//17:00              16          T_MD1_5       3 Trigger
+//20:00              18          T_MD1_6       4 Trigger
+//Saturday 11th June             T_MD1_3       Manual
+function T_MD1_4() {
+  updateAllPreviousRanks();
+  cutScores(14);
+}
+function T_MD1_5() {
+  cutScores(16);
+}
+function T_MD1_6() {
+  cutScores(18);
+}
+function T_MD1_1() {
+  updateScores(14,16,18);
+}
+
+//14:00              21          *T_MD1_8      5 Trigger
+//17:00              23          T_MD1_9       6 Trigger
+//20:00              25          T_MD1_10      7 Trigger
+//Sunday 12th June               T_MD1_7       Manual
+function T_MD1_8() {
+  updateAllPreviousRanks();
+  cutScores(21);
+}
+function T_MD1_9() {
+  cutScores(23);
+}
+function T_MD1_10() {
+  cutScores(25);
+}
+function T_MD1_7() {
+  updateScores(21,23,25);
+}
+
+//14:00              28          *T_MD1_12     8 Trigger
+//17:00              30          T_MD1_13      9 Trigger
+//20:00              32          T_MD1_14      10 Trigger
+//Monday 13th June               T_MD1_11      Manual
+function T_MD1_12() {
+  updateAllPreviousRanks();
+  cutScores(28);
+}
+function T_MD1_13() {
+  cutScores(30);
+}
+function T_MD1_14() {
+  cutScores(32);
+}
+function T_MD1_11() {
+  updateScores(28,30,32);
+}
+
+//17:00              35          *T_MD1_16     11 Trigger
+//20:00              37          T_MD1_17      12 Trigger
+//Tuesday 14th June              T_MD1_15      Manual
+function T_MD1_16() {
+  updateAllPreviousRanks();
+  cutScores(35);
+}
+function T_MD1_17() {
+  cutScores(37);
+}
+function T_MD1_15() {
+  updateScores(35,37);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+//14:00              45          *T_MD2_2      13 Trigger
+//17:00              47          T_MD2_3       14 Trigger
+//20:00              49          T_MD2_4       15 Trigger
+//Wednesday 15th June            T_MD2_1       Manual
+function T_MD2_2() {
+  updateAllPreviousRanks();
+  cutScores(45);
+}
+function T_MD2_3() {
+  cutScores(47);
+}
+function T_MD2_4() {
+  cutScores(49);
+}
+function T_MD2_1() {
+  updateScores(45,47,49);
+}
+
+//14:00              52          *T_MD2_6      16 Trigger
+//17:00              54          T_MD2_7       17 Trigger
+//20:00              56          T_MD2_8       18 Trigger
+//Thursday 16th June             T_MD2_5       Manual
+function T_MD2_6() {
+  updateAllPreviousRanks();
+  cutScores(52);
+}
+function T_MD2_7() {
+  cutScores(54);
+}
+function T_MD2_8() {
+  cutScores(56);
+}
+function T_MD2_5() {
+  updateScores(52,54,56);
+}
+
+//14:00              59          *T_MD2_10     19 Trigger
+//17:00              61          T_MD2_11      20 Trigger
+//20:00              63          T_MD2_12      21 Trigger
+//Friday 17th June               T_MD2_9       Manual
+function T_MD2_10() {
+  updateAllPreviousRanks();
+  cutScores(59);
+}
+function T_MD2_11() {
+  cutScores(61);
+}
+function T_MD2_12() {
+  cutScores(63);
+}
+function T_MD2_9() {
+  updateScores(59,61,63);
+}
+
+//14:00              66          *T_MD2_14     22 Trigger
+//17:00              68          T_MD2_15      23 Trigger
+//20:00              70          T_MD2_16      24 Trigger
+//Saturday 18th June             T_MD2_13      Manual
+function T_MD2_14() {
+  updateAllPreviousRanks();
+  cutScores(66);
+}
+function T_MD2_15() {
+  cutScores(68);
+}
+function T_MD2_16() {
+  cutScores(70);
+}
+function T_MD2_13() {
+  updateScores(66,68,70);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+//20:00              78          *T_MD3_2      25 Trigger 
+//20:00              80          T_MD3_3       26 Trigger
+//Sunday 19th June               T_MD3_1       Manual
+function T_MD3_2() {
+  updateAllPreviousRanks();
+  cutScores(78);
+}
+function T_MD3_3() {
+  cutScores(80);
+}
+function T_MD3_1() {
+  updateScores(78,80);
+}
+
+//20:00              83          *T_MD3_5      27 Trigger
+//20:00              85          T_MD3_6       28 Trigger
+//Monday 20th June               T_MD3_4       Manual
+function T_MD3_5() {
+  updateAllPreviousRanks();
+  cutScores(83);
+}
+function T_MD3_6() {
+  cutScores(85);
+}
+function T_MD3_4() {
+  updateScores(83,85);
+}
+
+//17:00              88          *T_MD3_8      29 Trigger
+//17:00              90          T_MD3_9       30 Trigger
+//20:00              92          T_MD3_10      31 Trigger
+//20:00              94          T_MD3_11      32 Trigger
+//Tuesday 21st June              T_MD3_7       Manual
+function T_MD3_8() {
+  updateAllPreviousRanks();
+  cutScores(88);
+  cutScores(90);
+}
+function T_MD3_10() {
+  cutScores(92);
+  cutScores(94)
+}
+function T_MD3_7() {
+  updateScores(88,90,92,94);
+}
+
+//17:00              97          *T_MD3_13     33 Trigger
+//17:00              99          T_MD3_14      34 Trigger
+//20:00              101         T_MD3_15      35 Trigger
+//20:00              103         T_MD3_16      36 Trigger
+//Wednesday 22nd June            T_MD3_12      Manual
+function T_MD3_13() {
+  updateAllPreviousRanks();
+  cutScores(97);
+  cutScores(99);
+}
+function T_MD3_15() {
+  cutScores(101);
+  cutScores(103)
+}
+function T_MD3_12() {
+  updateScores(97,99,101,103);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+function onEdit(e) {
+  
+  var range = e.range
+  var sheet = range.getSheet()
+  
+  if ((sheet.getName() == "Scores") && (range.getColumn() >= 67 && range.getColumn() <= range.getColumn() <= 69) && 
+  (range.getRow() >= 11 && range.getRow() <= 103)) {
+    Logger.log("onEdit() worked");
+    thirdPlaceTeams()
+  }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+function cutScores(gameID) {
+  for (var i = 0; i < arguments.length; i++) {
+    sheetScores.getRange(gameID,77,1,sheetScores.getLastColumn()-77).setValues(sheetScores.getRange(gameID,77,1,sheetScores.getLastColumn()-77).getValues())
+  }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+function updateScores() {
+  for (var i = 0; i < arguments.length; i++) {
+    setScores(arguments[i]);
+  }
+}
+
+function setScores(rowID) {
+  if ((sheetScores.getRange(rowID,67).getValue() == "") || (sheetScores.getRange(rowID,69).getValue() == "")) {
+    Logger.log("worked");
+    GmailApp.sendEmail("nkumar6@jaguarlandrover.com", "No score data in " + rowID, "");
+  }
+  else {
+  wrapper(rowID);
+  }
+}
+
+function wrapper(gameID) {
+  
+  var arrayKeys = getKeys();
+  var lengthArrayKeys = arrayKeys.length;
+  
+  for (var i = 0; i < lengthArrayKeys/2; i++) {
+    
+    var a = getScoresAllPlayers(gameID,arrayKeys[(2*i)+1])[0];
+    var b = getScoresAllPlayers(gameID,arrayKeys[(2*i)+1])[1];
+    var c = getScoresAllPlayers(gameID,arrayKeys[(2*i)+1])[2];
+    var d = getScoresAllPlayers(gameID,arrayKeys[(2*i)+1])[3];
+    var pointsTotal = pointsCalculateClassicLeague(a,b,c,d); 
+    
+    var ssPlayer = SpreadsheetApp.openById(arrayKeys[(2*i)])
+    sheetScores.getRange(gameID,arrayKeys[(2*i)+1]+3).setValue(pointsTotal);
+    
+  }
+  
+}
+
+function getKeys() {
+  
+  var arrayKeys = [];
+  var valuesKeys = sheetScores.getRange(7,1,1,sheetScores.getLastColumn()).getValues();
+  
+  for (var i = 0; i < valuesKeys[0].length; i++) {
+    if (valuesKeys[0][i] != "") {
+      arrayKeys.push(valuesKeys[0][i])
+      arrayKeys.push(i)
+    }
+  }
+  
+  return arrayKeys;
+  
+}
+
+function pointsCalculateClassicLeague(pre1,pre2,act1,act2) {
+  
+  var pointsTotal = 0;
+  var score1 = 0;
+  var score2 = 0;
+  var actGD = act1 - act2;
+  
+  if (pre1 != "" && isNaN(pre1) === false) {
+    score1 = pre1;
+  }
+  if (pre2 != "" && isNaN(pre2) === false) {
+    score2 = pre2;
+  }   
+  
+  var preGD = score1 - score2;
+  
+  if ((preGD < 0 && actGD < 0) || preGD > 0 && actGD > 0 || preGD == 0 && actGD == 0) {
+    pointsTotal += 3;
+  }
+  
+  if (score1 == act1) {
+    pointsTotal += 1;
+  }
+  
+  if (score2 == act2) {
+    pointsTotal += 1;
+  }
+  
+  if (actGD == preGD) {
+    pointsTotal += 1;
+  }
+  
+  return pointsTotal;
+  
+}
+
+function getScoresAllPlayers(gameID,columnID) {
+  
+  var a = sheetScores.getRange(gameID,columnID+1).getValue();
+  var b = sheetScores.getRange(gameID,columnID+2).getValue();
+  var c = sheetScores.getRange(gameID,67).getValue();
+  var d = sheetScores.getRange(gameID,69).getValue();
+  
+  return([a,b,c,d]);
+  
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+function copyPointsToTable() {
+  
+  var tempArray = sheetScores.getRange(1,77,1,sheetScores.getLastColumn()-76).getValues();
+  
+  Logger.log(tempArray);
+  Logger.log(tempArray[0].length);
+  
+  for (var i = 0, l = tempArray[0].length; i < l; i++) {
+    
+    if (tempArray[0][i] != "") {
+      
+      Logger.log(i)
+      sheetLeaderboardsUn.getRange(12+(i/3),68).setValue(sheetScores.getRange(39,77+i+2).getValue());
+      sheetLeaderboardsUn.getRange(12+(i/3),71).setValue(sheetScores.getRange(72,77+i+2).getValue());
+      sheetLeaderboardsUn.getRange(12+(i/3),74).setValue(sheetScores.getRange(105,77+i+2).getValue());
+      sheetLeaderboardsUn.getRange(12+(i/3),77).setValue(sheetScores.getRange(128,77+i+2).getValue());
+      sheetLeaderboardsUn.getRange(12+(i/3),80).setValue(sheetScores.getRange(147,77+i+2).getValue());      
+      
+      sheetLeaderboardsUn.getRange(12+(i/3),28).setValue(sheetScores.getRange(148,77+i+2).getValue()); 
+      
+    }
+    
+  }
+  
+  Logger.log(sheetScores.getRange(39,77+(i*3)+2).getValue())
+  
+}
+
+function updatePreviousRank(nameCol,fixedCol,dynCol) {
+  var arrayClassicSortedLarge = sheetLeaderboards.getRange(12,nameCol,100,1).getValues();
+  var arrayClassicSorted = [];
+  var arrayClassicUnsorted = sheetLeaderboardsUn.getRange(12,nameCol,100,1).getValues();
+  
+  for (var i = 0, len = arrayClassicSortedLarge.length; i < len; i++) {
+    if (arrayClassicSortedLarge[i] != "") {
+      arrayClassicSorted.push(arrayClassicSortedLarge[i])
+    }
+  }
+  
+  for (var j = 0, len2 = arrayClassicSorted.length; j < len2; j++) {
+    for (var k = 0, len3 = arrayClassicUnsorted.length; k < len3; k++) {
+      if (arrayClassicUnsorted[k][0] === arrayClassicSorted[j][0]) {
+        sheetLeaderboardsUn.getRange(12+k,dynCol).setValue(sheetLeaderboards.getRange(12+j,fixedCol).getValue())
+      }
+    }
+  }
+  
+}
+
+function updateAllPreviousRanks() {
+  
+  updatePreviousRank(11,4,9)
+  updatePreviousRank(128,121,126)
+  updatePreviousRank(93,86,91)
+  
+}
+
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+// Function to duplicate template spreadsheet, get id of duplicate, set id in Scores!XX7
+//    provide oAuth to user so buttons work
+
+function createPlayerSpreadsheet(firstName, lastName, primaryEmail, teamName) {
+  
+  var ssTemplate = DriveApp.getFileById("1De_fgtgfMVlDRdl5i1CFbkXaTnu5hoFTODgWtYcCsq4");
+  var ssDuplicate = ssTemplate.makeCopy("Euro 2016 Predictions Game : "  + firstName + " " + lastName).setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.EDIT).addEditor("jtomlins@jaguarlandrover.com");
+  //.addEditor(primaryEmail);
+  var newSpreadsheet = SpreadsheetApp.openById(ssDuplicate.getId());
+  var sheetCLR = newSpreadsheet.getSheetByName("Classic - League Round");
+  var sheetCF = newSpreadsheet.getSheetByName("Classic - Finals");
+  var sheetH2H = newSpreadsheet.getSheetByName("Head-to-Head");
+  var sheetLB = newSpreadsheet.getSheetByName("Leaderboards");
+  var fullName = firstName + " " + lastName;
+  
+  DriveApp.getFolderById("0B9_bbPVJWKFrc0JGaVYwWUN4Qmc").addFile(DriveApp.getFilesByName("Euro 2016 Predictions Game : "  + firstName + " " + lastName).next())
+  DriveApp.getFolderById("0BzQPWphhW-fhYU45NzVzSHp2bTA").removeFile(DriveApp.getFilesByName("Euro 2016 Predictions Game : "  + firstName + " " + lastName).next());
+  
+  // Frontend
+  
+  sheetCLR.getRange(3,72).setValue(fullName);
+  
+  // Backend - Scores tab
+  
+  var lastColumnScores = sheetScores.getLastColumn();
+  sheetScores.insertColumnsAfter(lastColumnScores,3);
+  
+  sheetScores.getRange(1,77,160,3).copyFormatToRange(sheetScores,lastColumnScores+1,lastColumnScores+3,1,160);
+  sheetScores.getRange(1,lastColumnScores+1).setValue(sheetScores.getRange(1,lastColumnScores-2).getValue()+1);
+  sheetScores.getRange(2,lastColumnScores+1).setFormula(sheetScores.getRange(2,77).getFormula())
+  sheetScores.getRange(3,lastColumnScores+1,3,2).setValues(sheetScores.getRange(3,77,3,2).getValues());
+  
+  //sheetScores.getRange(6,lastColumnScores+1).setValue(teamName);
+  sheetScores.getRange(7,lastColumnScores+1).setValue(ssDuplicate.getId());
+  sheetScores.getRange(8,lastColumnScores+1).setValue(fullName);
+  sheetScores.getRange(9,lastColumnScores+1).setValue(primaryEmail);
+  sheetScores.getRange(10,lastColumnScores+1,1,3).setValues(sheetScores.getRange(10,77,1,3).getValues());
+  
+  sheetScores.getRange(11,lastColumnScores+1,150,3).setFormulas(sheetScores.getRange(11,77,150,3).getFormulas());
+  
+  // Backend - Head-to-Head tab
+  
+  var lastColumnHH = sheetHH.getLastColumn()
+  sheetHH.insertColumnsAfter(lastColumnHH,3);
+  
+  sheetHH.getRange(1,77,160,3).copyFormatToRange(sheetHH,lastColumnHH+1,lastColumnHH+3,1,160);
+  sheetHH.getRange(1,lastColumnHH+1).setValue(sheetHH.getRange(1,lastColumnHH-2).getValue()+1);
+  sheetHH.getRange(3,lastColumnHH+1,3,2).setValues(sheetHH.getRange(3,77,3,2).getValues());
+  
+  sheetHH.getRange(6,lastColumnHH+1).setFormula(sheetHH.getRange(6,77).getFormula());;
+  sheetHH.getRange(7,lastColumnHH+1).setValue(ssDuplicate.getId());
+  sheetHH.getRange(8,lastColumnHH+1).setValue(fullName);
+  sheetHH.getRange(9,lastColumnHH+1).setValue(primaryEmail);
+  sheetHH.getRange(10,lastColumnHH+1,1,3).setValues(sheetHH.getRange(10,77,1,3).getValues());
+  
+  sheetHH.getRange(11,lastColumnHH+1,150,3).setFormulas(sheetHH.getRange(11,77,150,3).getFormulas());
+  
+  // Backend - Head-to-Head Scores tab
+  
+  var lastColumnHHSc = sheetHHSc.getLastColumn()
+  sheetHHSc.insertColumnsAfter(lastColumnHHSc,3);
+  
+  sheetHHSc.getRange(1,77,160,3).copyFormatToRange(sheetHHSc,lastColumnHHSc+1,lastColumnHHSc+3,1,160);
+  sheetHHSc.getRange(1,lastColumnHHSc+1).setValue(sheetHHSc.getRange(1,lastColumnHHSc-2).getValue()+1);
+  sheetHHSc.getRange(3,lastColumnHHSc+1,3,2).setValues(sheetHHSc.getRange(3,77,3,2).getValues());
+  
+  sheetHHSc.getRange(6,lastColumnHHSc+1).setFormula(sheetHHSc.getRange(6,77).getFormula());
+  sheetHHSc.getRange(7,lastColumnHHSc+1).setValue(ssDuplicate.getId());
+  sheetHHSc.getRange(8,lastColumnHHSc+1).setValue(fullName);
+  sheetHHSc.getRange(9,lastColumnHHSc+1).setValue(primaryEmail);
+  sheetHHSc.getRange(10,lastColumnHHSc+1,1,3).setValues(sheetHHSc.getRange(10,77,1,3).getValues());
+  
+  sheetHHSc.getRange(11,lastColumnHHSc+1,150,3).setFormulas(sheetHHSc.getRange(11,77,150,3).getFormulas());
+  
+  // Backend - Head-to-Head Fixtures tab
+  
+  //////////////// IF statement required, find way toi work out when new unique team is added (needed? maybe do this sheet after teams have been decided?)
+  
+  
+  // set protection ( setUnprotectedRanges(ranges) )
+  
+}
+
+function createUser() {
+  
+/*  createPlayerSpreadsheet("BLANK-FirstName", "BLANK-Surname", "BLANK-EmailAddress", "")
+*/
+  
+/*  EMAIL ADDRESS BLANKED  */ 
+  
+}
+
+
+function thirdPlaceTeams() {
+  
+  var arrayThird = sheetTables.getRange(112,79,4,1).getValues();
+  var arrayThirdSmall = arrayThird[0]+arrayThird[1]+arrayThird[2]+arrayThird[3];
+  
+  var teamsQual = sheetTables.getRange(112,52,4,1).getValues();
+  
+  var teamWinA = "";
+  var teamWinB = "";
+  var teamWinC = "";
+  var teamWinD = "";
+  
+  var arrayThirdPlacePair = 
+      [
+        ["ABCD",3,4,1,2],
+        ["ABCE",3,1,2,4],
+        ["ABCF",3,1,2,4],
+        ["ABDE",3,1,2,4],
+        ["ABDF",3,1,2,4],
+        ["ABEF",3,1,2,4],
+        ["ACDE",2,3,1,4],
+        ["ACDF",2,3,1,4],
+        ["ACEF",2,1,4,3],
+        ["ADEF",2,1,4,3],
+        ["BCDE",2,3,1,4],
+        ["BCDF",2,3,1,4],
+        ["BCEF",3,2,1,4],
+        ["BDEF",3,2,1,4],
+        ["CDEF",1,2,4,3],
+      ];
+        
+        for (var i = 0, len = arrayThirdPlacePair.length; i < len; i++) {
+        
+        if (arrayThirdPlacePair[i][0] == arrayThirdSmall) {
+          teamWinA = teamsQual[arrayThirdPlacePair[i][1]-1];
+          teamWinB = teamsQual[arrayThirdPlacePair[i][2]-1];
+          teamWinC = teamsQual[arrayThirdPlacePair[i][3]-1];
+          teamWinD = teamsQual[arrayThirdPlacePair[i][4]-1];
+          sheetScores.getRange(114,52).setValue(teamWinD);
+          sheetScores.getRange(116,52).setValue(teamWinB);
+          sheetScores.getRange(120,52).setValue(teamWinA);
+          sheetScores.getRange(124,52).setValue(teamWinC);
+  }
+} 
+
+}
+
+
+function testEmail() {
+  
+  var email = "";  // EMAIL ADDRESS BLANKED
+  GmailApp.sendEmail(email, "test", "test");
+  
+}
+
+function timeTriggers() {
+  
+  var rangeCount = sheetDates.getRange("B11:B143").getValues();
+  var range = sheetDates.getRange("B11:E143").getValues();
+  var arrayDates = [];
+  
+  for (var i = 0, len = rangeCount.length; i < len; i++) {
+    if (rangeCount[i][0] != "") {
+      arrayDates.push(range[i]);
+      //var dateTrigger = new Date(
+    }
+  }
+  //Logger.log(arrayDates)
+  
+  for (var j = 0, len2 = arrayDates.length; j < len2; j++) {
+    var dateTrigger = new Date(arrayDates[j][0],arrayDates[j][1]-1,arrayDates[j][2],arrayDates[j][3],0,0,0)
+    Logger.log(arrayDates[j][0]+" "+arrayDates[j][1]+" "+arrayDates[j][2]+" "+arrayDates[j][3]+" "+arrayDates[j][4])
+    Logger.log(dateTrigger)
+    ScriptApp.newTrigger('testEmail')
+    .timeBased()
+    .at(dateTrigger)
+    .create() 
+  }
+
+}
